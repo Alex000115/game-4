@@ -11,15 +11,14 @@
         <h1>Tic-Tac-Toe</h1>
         
         <div id="setup-screen">
-            <h3>Choose AI Difficulty</h3>
-            <div class="menu-btns">
-                <button onclick="startGame('easy')">Easy (You can Win!)</button>
-                <button onclick="startGame('hard')">Hard (Unbeatable)</button>
-            </div>
+            <h3>Select Game Mode</h3>
+            <button onclick="startGame('easy')">Easy AI (Winable)</button>
+            <button onclick="startGame('hard')">Hard AI (Unbeatable)</button>
+            <button onclick="startGame('pvp')" style="background: #fab1a0;">2 Players (PvP)</button>
         </div>
 
         <div id="game-screen" style="display:none;">
-            <div id="status">Your Turn (X)</div>
+            <div id="status">Player X's Turn</div>
             <div class="board" id="board">
                 <div class="cell" onclick="makeMove(0)"></div>
                 <div class="cell" onclick="makeMove(1)"></div>
