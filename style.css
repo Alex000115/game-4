@@ -4,11 +4,12 @@
     --card: #1e293b;
     --text: #f8fafc;
     --accent: #ff7675;
-    --win-color: #55efc4;
+    --win-bg: #55efc4;
 }
 
 body {
-    background-color: var(--bg); color: var(--text);
+    background-color: var(--bg);
+    color: var(--text);
     font-family: 'Segoe UI', sans-serif;
     display: flex; justify-content: center; align-items: center;
     height: 100vh; margin: 0;
@@ -20,6 +21,7 @@ body {
 }
 
 h1 { color: var(--primary); margin: 0 0 20px 0; }
+h3 { font-weight: normal; margin-bottom: 20px; opacity: 0.9; }
 
 button {
     background: var(--primary); color: #1e293b; border: none;
@@ -28,6 +30,7 @@ button {
 }
 
 button:hover { transform: translateY(-3px); filter: brightness(1.1); }
+.pvp-btn { background: #fab1a0; }
 
 .board {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;
@@ -37,17 +40,18 @@ button:hover { transform: translateY(-3px); filter: brightness(1.1); }
     aspect-ratio: 1/1; background: #334155; border-radius: 12px;
     display: flex; justify-content: center; align-items: center;
     font-size: 2.2rem; font-weight: 800; cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+/* Winner Marker Style */
 .cell.winner {
-    background: var(--win-color) !important;
+    background-color: var(--win-bg) !important;
     color: #1e293b !important;
     transform: scale(1.05);
 }
 
-#status { font-size: 1.2rem; margin-bottom: 10px; color: var(--accent); }
-
-.reset-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+#status { font-size: 1.2rem; margin-bottom: 10px; color: var(--accent); font-weight: bold; }
+.reset-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); margin-top: 10px; }
 
 footer { margin-top: 25px; font-size: 0.85rem; opacity: 0.7; }
-footer a { color: var(--accent); text-decoration: none; }
+footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
