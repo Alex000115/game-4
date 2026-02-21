@@ -21,25 +21,29 @@ function makeMove(index) {
         updateUI();
         
         if (checkWin(currentPlayer)) {
-            endGame(currentPlayer);
+            gameActive = false;
+            document.getElementById('status').innerText = `Player ${currentPlayer} Wins!`;
             return;
         }
-        if (board.every(cell => cell !== '')) {
-            endGame('tie');
+        
+        if (!board.includes('')) {
+            gameActive = false;
+            document.getElementById('status').innerText = "It's a Tie!";
             return;
         }
 
         currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
-        document.getElementById('status').innerText = `Player ${currentPlayer}'s Turn`;
+        document.getElementById('status').innerText = `Turn: ${currentPlayer}`;
 
+        // AI Move Logic
         if (gameMode !== 'pvp' && currentPlayer === 'O') {
-            gameActive = false; // Pause user input during AI turn
-            setTimeout(aiMove, 600);
+            gameActive = false; 
+            setTimeout(aiLogic, 600);
         }
     }
 }
 
-function aiMove() {
+function aiLogic() {
     let move;
     if (gameMode === 'easy' && Math.random() < 0.5) {
         let available = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
@@ -53,9 +57,11 @@ function aiMove() {
     gameActive = true;
 
     if (checkWin('O')) {
-        endGame('O');
-    } else if (board.every(cell => cell !== '')) {
-        endGame('tie');
+        gameActive = false;
+        document.getElementById('status').innerText = "AI Wins!";
+    } else if (!board.includes('')) {
+        gameActive = false;
+        document.getElementById('status').innerText = "It's a Tie!";
     } else {
         currentPlayer = 'X';
         document.getElementById('status').innerText = "Your Turn (X)";
@@ -63,27 +69,17 @@ function aiMove() {
 }
 
 function checkWin(player) {
-    return winPatterns.some(pattern => {
-        if (pattern.every(index => board[index] === player)) {
-            if (gameActive || gameMode !== 'pvp') highlightWinner(pattern);
+    for (let pattern of winPatterns) {
+        if (pattern.every(idx => board[idx] === player)) {
+            // MARK the winning cells
+            const cells = document.querySelectorAll('.cell');
+            pattern.forEach(idx => cells[idx].classList.add('winner'));
             return true;
         }
-        return false;
-    });
+    }
+    return false;
 }
 
-function highlightWinner(pattern) {
-    const cells = document.querySelectorAll('.cell');
-    pattern.forEach(index => cells[index].classList.add('winner'));
-}
-
-function endGame(result) {
-    gameActive = false;
-    if (result === 'tie') document.getElementById('status').innerText = "It's a Tie!";
-    else document.getElementById('status').innerText = `Player ${result} Wins!`;
-}
-
-// --- Minimax Algorithm ---
 function getBestMove() {
     let bestScore = -Infinity;
     let move;
@@ -101,7 +97,7 @@ function getBestMove() {
 function minimax(b, depth, isMax) {
     if (checkWinSilent(b, 'O')) return 10;
     if (checkWinSilent(b, 'X')) return -10;
-    if (b.every(c => c !== '')) return 0;
+    if (!b.includes('')) return 0;
 
     if (isMax) {
         let best = -Infinity;
@@ -141,11 +137,12 @@ function updateUI() {
 function resetBoard() {
     board = ['', '', '', '', '', '', '', '', ''];
     currentPlayer = 'X';
-    document.querySelectorAll('.cell').forEach(c => {
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(c => {
         c.innerText = '';
         c.classList.remove('winner');
     });
-    document.getElementById('status').innerText = "Player X's Turn";
+    document.getElementById('status').innerText = "Your Turn (X)";
 }
 
 function backToMenu() {
