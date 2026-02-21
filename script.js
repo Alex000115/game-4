@@ -1,5 +1,5 @@
 let board = ['', '', '', '', '', '', '', '', ''];
-let currentPlayer = 'X'; // User is X
+let currentPlayer = 'X';
 let aiPlayer = 'O';
 let gameActive = false;
 let difficulty = 'hard';
@@ -13,35 +13,38 @@ function startGame(mode) {
 }
 
 function makeMove(index) {
-    if (board[index] === '' && gameActive) {
+    if (board[index] === '' && gameActive && currentPlayer === 'X') {
         board[index] = currentPlayer;
-        updateBoard();
-        if (!checkWinner(board)) {
-            setTimeout(aiMove, 500); // AI moves after 0.5s
+        updateUI();
+        if (!checkGameStatus()) {
+            currentPlayer = 'O';
+            document.getElementById('status').innerText = "AI is thinking...";
+            setTimeout(aiMove, 600);
         }
     }
 }
 
 function aiMove() {
+    if (!gameActive) return;
+
     let move;
-    
-    // Easy mode: AI makes a random mistake 50% of the time
+    // Easy Mode Logic: 50% chance of making a random mistake
     if (difficulty === 'easy' && Math.random() < 0.5) {
-        let availableMoves = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
-        move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        let available = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+        move = available[Math.floor(Math.random() * available.length)];
     } else {
-        // Hard mode or Smart move in Easy: Use Minimax
         move = getBestMove();
     }
 
-    if (move !== undefined) {
-        board[move] = aiPlayer;
-        updateBoard();
-        checkWinner(board);
+    board[move] = aiPlayer;
+    updateUI();
+    
+    if (!checkGameStatus()) {
+        currentPlayer = 'X';
+        document.getElementById('status').innerText = "Your Turn (X)";
     }
 }
 
-// Minimax Algorithm Logic
 function getBestMove() {
     let bestScore = -Infinity;
     let move;
@@ -59,72 +62,71 @@ function getBestMove() {
     return move;
 }
 
-function minimax(tempBoard, depth, isMaximizing) {
-    let result = checkWinnerSilent(tempBoard);
-    if (result === aiPlayer) return 10;
-    if (result === currentPlayer) return -10;
-    if (result === 'tie') return 0;
+function minimax(b, depth, isMax) {
+    let res = checkWinnerSilent(b);
+    if (res === aiPlayer) return 10;
+    if (res === 'X') return -10;
+    if (res === 'tie') return 0;
 
-    if (isMaximizing) {
-        let bestScore = -Infinity;
+    if (isMax) {
+        let best = -Infinity;
         for (let i = 0; i < 9; i++) {
-            if (tempBoard[i] === '') {
-                tempBoard[i] = aiPlayer;
-                let score = minimax(tempBoard, depth + 1, false);
-                tempBoard[i] = '';
-                bestScore = Math.max(score, bestScore);
+            if (b[i] === '') {
+                b[i] = aiPlayer;
+                best = Math.max(best, minimax(b, depth + 1, false));
+                b[i] = '';
             }
         }
-        return bestScore;
+        return best;
     } else {
-        let bestScore = Infinity;
+        let best = Infinity;
         for (let i = 0; i < 9; i++) {
-            if (tempBoard[i] === '') {
-                tempBoard[i] = currentPlayer;
-                let score = minimax(tempBoard, depth + 1, true);
-                tempBoard[i] = '';
-                bestScore = Math.min(score, bestScore);
+            if (b[i] === '') {
+                b[i] = 'X';
+                best = Math.min(best, minimax(b, depth + 1, true));
+                b[i] = '';
             }
         }
-        return bestScore;
+        return best;
     }
 }
 
-// Helper functions for UI and Winning logic
-function updateBoard() {
-    const cells = document.querySelectorAll('.cell');
-    board.forEach((val, i) => cells[i].innerText = val);
-}
-
-function checkWinner(b) {
-    let winner = checkWinnerSilent(b);
-    if (winner) {
+function checkGameStatus() {
+    let result = checkWinnerSilent(board);
+    if (result) {
         gameActive = false;
-        document.getElementById('status').innerText = winner === 'tie' ? "It's a Tie!" : `${winner} Wins!`;
+        if (result === 'tie') document.getElementById('status').innerText = "It's a Tie!";
+        else document.getElementById('status').innerText = result === 'X' ? "You Win!" : "AI Wins!";
         return true;
     }
     return false;
 }
 
 function checkWinnerSilent(b) {
-    const winPatterns = [
-        [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]
-    ];
-    for (let p of winPatterns) {
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (let p of wins) {
         if (b[p[0]] && b[p[0]] === b[p[1]] && b[p[0]] === b[p[2]]) return b[p[0]];
     }
-    if (!b.includes('')) return 'tie';
-    return null;
+    return b.includes('') ? null : 'tie';
+}
+
+function updateUI() {
+    const cells = document.querySelectorAll('.cell');
+    board.forEach((val, i) => {
+        cells[i].innerText = val;
+        cells[i].style.color = val === 'X' ? '#a29bfe' : '#ff7675';
+    });
 }
 
 function resetBoard() {
     board = ['', '', '', '', '', '', '', '', ''];
+    currentPlayer = 'X';
     gameActive = true;
-    document.getElementById('status').innerText = "Your Turn";
-    updateBoard();
+    document.getElementById('status').innerText = "Your Turn (X)";
+    updateUI();
 }
 
-function resetGame() {
+function backToMenu() {
     document.getElementById('setup-screen').style.display = 'block';
     document.getElementById('game-screen').style.display = 'none';
 }
