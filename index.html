@@ -8,19 +8,17 @@
 
 <h1>Tic Tac Toe</h1>
 
-<div id="menu" class="menu">
-  <button onclick="startGame('two')">Two Player</button>
-  <button onclick="startGame('medium')">Medium AI</button>
-  <button onclick="startGame('hard')">Hard AI</button>
+<div class="controls">
+  <button onclick="setMode('two')">Two Player</button>
+  <button onclick="setMode('medium')">Medium AI</button>
+  <button onclick="setMode('hard')">Hard AI</button>
 </div>
 
-<div id="game" style="display:none;">
-  <div id="board" class="board"></div>
-  <h2 id="status"></h2>
+<div id="board" class="board"></div>
 
-  <button onclick="playAgain()">Play Again</button>
-  <button onclick="backToMenu()">Back to Menu</button>
-</div>
+<h2 id="status"></h2>
+
+<button onclick="resetGame()">Restart</button>
 
 <script src="script.js"></script>
 </body>
