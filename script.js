@@ -1,26 +1,37 @@
-let board = ["","","","","","","","",""];
-let currentPlayer = "X";
-let gameActive = true;
-let mode = "two";
+let board;
+let currentPlayer;
+let gameActive;
+let mode;
 
-const boardDiv = document.getElementById("board");
-const statusText = document.getElementById("status");
+const boardDiv=document.getElementById("board");
+const statusText=document.getElementById("status");
+const menu=document.getElementById("menu");
+const game=document.getElementById("game");
+
+function startGame(selectedMode){
+  mode=selectedMode;
+  menu.classList.add("hidden");
+  game.classList.remove("hidden");
+  initGame();
+}
+
+function initGame(){
+  board=["","","","","","","","",""];
+  currentPlayer="X";
+  gameActive=true;
+  statusText.innerText="";
+  drawBoard();
+}
 
 function drawBoard(){
   boardDiv.innerHTML="";
   board.forEach((cell,i)=>{
-    let div=document.createElement("div");
+    const div=document.createElement("div");
     div.className="cell";
     div.innerText=cell;
     div.onclick=()=>move(i);
     boardDiv.appendChild(div);
   });
-}
-drawBoard();
-
-function setMode(m){
-  mode=m;
-  resetGame();
 }
 
 function move(i){
@@ -29,15 +40,9 @@ function move(i){
   board[i]=currentPlayer;
   drawBoard();
 
-  if(checkWinner()){
-    statusText.innerText=currentPlayer+" Wins!";
-    gameActive=false;
-    return;
-  }
-
-  if(!board.includes("")){
-    statusText.innerText="Draw!";
-    gameActive=false;
+  let result=checkWinner(board);
+  if(result){
+    endGame(result);
     return;
   }
 
@@ -54,10 +59,10 @@ function aiMove(){
   if(mode==="hard"){
     moveIndex=bestMove();
   }
-  else if(mode==="medium"){
+  else{
     if(Math.random()<0.6){
       moveIndex=bestMove();
-    } else{
+    }else{
       moveIndex=randomMove();
     }
   }
@@ -65,15 +70,9 @@ function aiMove(){
   board[moveIndex]="O";
   drawBoard();
 
-  if(checkWinner()){
-    statusText.innerText="O Wins!";
-    gameActive=false;
-    return;
-  }
-
-  if(!board.includes("")){
-    statusText.innerText="Draw!";
-    gameActive=false;
+  let result=checkWinner(board);
+  if(result){
+    endGame(result);
     return;
   }
 
@@ -107,7 +106,7 @@ function bestMove(){
 }
 
 function minimax(b,isMax){
-  let result=checkWinnerMini(b);
+  let result=checkWinner(b);
   if(result!==null){
     const scores={O:1,X:-1,draw:0};
     return scores[result];
@@ -123,7 +122,7 @@ function minimax(b,isMax){
       }
     }
     return best;
-  } else{
+  }else{
     let best=Infinity;
     for(let i=0;i<9;i++){
       if(b[i]===""){
@@ -136,11 +135,7 @@ function minimax(b,isMax){
   }
 }
 
-function checkWinner(){
-  return checkWinnerMini(board);
-}
-
-function checkWinnerMini(b){
+function checkWinner(b){
   const wins=[
     [0,1,2],[3,4,5],[6,7,8],
     [0,3,6],[1,4,7],[2,5,8],
@@ -154,26 +149,24 @@ function checkWinnerMini(b){
   }
 
   if(!b.includes("")) return "draw";
-
   return null;
 }
 
-function resetGame(){
-  board=["","","","","","","","",""];
-  currentPlayer="X";
-  gameActive=true;
-  statusText.innerText="";
-  drawBoard();
-}
-function playAgain(){
-  board=["","","","","","","","",""];
-  currentPlayer="X";
-  gameActive=true;
-  statusText.innerText="";
-  drawBoard();
+function endGame(result){
+  gameActive=false;
 
-  // যদি AI mode হয় এবং AI আগে খেলতে হয়
-  if(currentPlayer==="O" && mode!=="two"){
-    setTimeout(aiMove,400);
+  if(result==="draw"){
+    statusText.innerText="It's a Tie!";
+  }else{
+    statusText.innerText=result+" Wins!";
   }
+}
+
+function playAgain(){
+  initGame();
+}
+
+function backToMenu(){
+  game.classList.add("hidden");
+  menu.classList.remove("hidden");
 }
