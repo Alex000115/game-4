@@ -1,57 +1,29 @@
-:root {
-    --primary: #a29bfe;
-    --bg: #0f172a;
-    --card: #1e293b;
-    --text: #f8fafc;
-    --accent: #ff7675;
-    --win-bg: #55efc4;
+body{
+  text-align:center;
+  font-family:Arial;
 }
 
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', sans-serif;
-    display: flex; justify-content: center; align-items: center;
-    height: 100vh; margin: 0;
+.board{
+  display:grid;
+  grid-template-columns:repeat(3,100px);
+  gap:5px;
+  justify-content:center;
+  margin:20px;
 }
 
-.container {
-    background: var(--card); padding: 2.5rem; border-radius: 24px;
-    text-align: center; width: 320px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+.cell{
+  width:100px;
+  height:100px;
+  background:#eee;
+  font-size:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
 
-h1 { color: var(--primary); margin: 0 0 20px 0; }
-h3 { font-weight: normal; margin-bottom: 20px; opacity: 0.9; }
-
-button {
-    background: var(--primary); color: #1e293b; border: none;
-    padding: 12px; margin: 8px 0; width: 100%; border-radius: 12px;
-    font-weight: bold; cursor: pointer; transition: 0.3s;
+button{
+  padding:10px 15px;
+  margin:5px;
+  font-size:16px;
 }
-
-button:hover { transform: translateY(-3px); filter: brightness(1.1); }
-.pvp-btn { background: #fab1a0; }
-
-.board {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;
-}
-
-.cell {
-    aspect-ratio: 1/1; background: #334155; border-radius: 12px;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 2.2rem; font-weight: 800; cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-/* Winner Marker Style */
-.cell.winner {
-    background-color: var(--win-bg) !important;
-    color: #1e293b !important;
-    transform: scale(1.05);
-}
-
-#status { font-size: 1.2rem; margin-bottom: 10px; color: var(--accent); font-weight: bold; }
-.reset-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); margin-top: 10px; }
-
-footer { margin-top: 25px; font-size: 0.85rem; opacity: 0.7; }
-footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
