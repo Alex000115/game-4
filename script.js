@@ -165,3 +165,15 @@ function resetGame(){
   statusText.innerText="";
   drawBoard();
 }
+function playAgain(){
+  board=["","","","","","","","",""];
+  currentPlayer="X";
+  gameActive=true;
+  statusText.innerText="";
+  drawBoard();
+
+  // যদি AI mode হয় এবং AI আগে খেলতে হয়
+  if(currentPlayer==="O" && mode!=="two"){
+    setTimeout(aiMove,400);
+  }
+}
