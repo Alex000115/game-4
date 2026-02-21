@@ -42,7 +42,7 @@ function move(i){
 
   let result=checkWinner(board);
   if(result){
-    endGame(result);
+    endGame(result.winner,result.combo);
     return;
   }
 
@@ -58,8 +58,7 @@ function aiMove(){
 
   if(mode==="hard"){
     moveIndex=bestMove();
-  }
-  else{
+  }else{
     if(Math.random()<0.6){
       moveIndex=bestMove();
     }else{
@@ -72,7 +71,7 @@ function aiMove(){
 
   let result=checkWinner(board);
   if(result){
-    endGame(result);
+    endGame(result.winner,result.combo);
     return;
   }
 
@@ -80,10 +79,7 @@ function aiMove(){
 }
 
 function randomMove(){
-  let empty=board
-  .map((v,i)=>v===""?i:null)
-  .filter(v=>v!==null);
-
+  let empty=board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
   return empty[Math.floor(Math.random()*empty.length)];
 }
 
@@ -109,7 +105,7 @@ function minimax(b,isMax){
   let result=checkWinner(b);
   if(result!==null){
     const scores={O:1,X:-1,draw:0};
-    return scores[result];
+    return scores[result.winner];
   }
 
   if(isMax){
@@ -142,24 +138,31 @@ function checkWinner(b){
     [0,4,8],[2,4,6]
   ];
 
-  for(let [a,b1,c] of wins){
+  for(let combo of wins){
+    let [a,b1,c]=combo;
     if(b[a] && b[a]===b[b1] && b[a]===b[c]){
-      return b[a];
+      return {winner:b[a], combo:combo};
     }
   }
 
-  if(!b.includes("")) return "draw";
+  if(!b.includes("")) return {winner:"draw"};
   return null;
 }
 
-function endGame(result){
+function endGame(winner,combo){
   gameActive=false;
 
-  if(result==="draw"){
+  if(winner==="draw"){
     statusText.innerText="It's a Tie!";
   }else{
-    statusText.innerText=result+" Wins!";
+    statusText.innerText=winner+" Wins!";
+    highlightWin(combo);
   }
+}
+
+function highlightWin(combo){
+  const cells=document.querySelectorAll(".cell");
+  combo.forEach(i=>cells[i].classList.add("win"));
 }
 
 function playAgain(){
