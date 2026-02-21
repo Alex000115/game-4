@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Pro | NAZRUUL</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        
+        <div id="setup-screen">
+            <h3>Select Difficulty</h3>
+            <button onclick="startGame('easy')">Easy (You can Win!)</button>
+            <button onclick="startGame('hard')">Hard (Unbeatable)</button>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="status">Your Turn</div>
+            <div class="board" id="board">
+                <div class="cell" onclick="makeMove(0)"></div>
+                <div class="cell" onclick="makeMove(1)"></div>
+                <div class="cell" onclick="makeMove(2)"></div>
+                <div class="cell" onclick="makeMove(3)"></div>
+                <div class="cell" onclick="makeMove(4)"></div>
+                <div class="cell" onclick="makeMove(5)"></div>
+                <div class="cell" onclick="makeMove(6)"></div>
+                <div class="cell" onclick="makeMove(7)"></div>
+                <div class="cell" onclick="makeMove(8)"></div>
+            </div>
+            <button onclick="resetGame()">Back to Menu</button>
+        </div>
+
+        <footer>Developed by <a href="https://github.com/Alex000115" target="_blank">NAZRUUL</a></footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
