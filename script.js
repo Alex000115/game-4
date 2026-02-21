@@ -1,11 +1,14 @@
 let board = ['', '', '', '', '', '', '', '', ''];
 let currentPlayer = 'X';
-let aiPlayer = 'O';
 let gameActive = false;
-let difficulty = 'hard';
+let gameMode = 'hard'; 
+
+const winPatterns = [
+    [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]
+];
 
 function startGame(mode) {
-    difficulty = mode;
+    gameMode = mode;
     gameActive = true;
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
@@ -13,66 +16,98 @@ function startGame(mode) {
 }
 
 function makeMove(index) {
-    if (board[index] === '' && gameActive && currentPlayer === 'X') {
+    if (board[index] === '' && gameActive) {
         board[index] = currentPlayer;
         updateUI();
-        if (!checkGameStatus()) {
-            currentPlayer = 'O';
-            document.getElementById('status').innerText = "AI is thinking...";
+        
+        if (checkWin(currentPlayer)) {
+            endGame(currentPlayer);
+            return;
+        }
+        if (board.every(cell => cell !== '')) {
+            endGame('tie');
+            return;
+        }
+
+        currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+        document.getElementById('status').innerText = `Player ${currentPlayer}'s Turn`;
+
+        if (gameMode !== 'pvp' && currentPlayer === 'O') {
+            gameActive = false; // Pause user input during AI turn
             setTimeout(aiMove, 600);
         }
     }
 }
 
 function aiMove() {
-    if (!gameActive) return;
-
     let move;
-    // Easy Mode Logic: 50% chance of making a random mistake
-    if (difficulty === 'easy' && Math.random() < 0.5) {
+    if (gameMode === 'easy' && Math.random() < 0.5) {
         let available = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
         move = available[Math.floor(Math.random() * available.length)];
     } else {
         move = getBestMove();
     }
 
-    board[move] = aiPlayer;
+    board[move] = 'O';
     updateUI();
-    
-    if (!checkGameStatus()) {
+    gameActive = true;
+
+    if (checkWin('O')) {
+        endGame('O');
+    } else if (board.every(cell => cell !== '')) {
+        endGame('tie');
+    } else {
         currentPlayer = 'X';
         document.getElementById('status').innerText = "Your Turn (X)";
     }
 }
 
+function checkWin(player) {
+    return winPatterns.some(pattern => {
+        if (pattern.every(index => board[index] === player)) {
+            if (gameActive || gameMode !== 'pvp') highlightWinner(pattern);
+            return true;
+        }
+        return false;
+    });
+}
+
+function highlightWinner(pattern) {
+    const cells = document.querySelectorAll('.cell');
+    pattern.forEach(index => cells[index].classList.add('winner'));
+}
+
+function endGame(result) {
+    gameActive = false;
+    if (result === 'tie') document.getElementById('status').innerText = "It's a Tie!";
+    else document.getElementById('status').innerText = `Player ${result} Wins!`;
+}
+
+// --- Minimax Algorithm ---
 function getBestMove() {
     let bestScore = -Infinity;
     let move;
     for (let i = 0; i < 9; i++) {
         if (board[i] === '') {
-            board[i] = aiPlayer;
+            board[i] = 'O';
             let score = minimax(board, 0, false);
             board[i] = '';
-            if (score > bestScore) {
-                bestScore = score;
-                move = i;
-            }
+            if (score > bestScore) { bestScore = score; move = i; }
         }
     }
     return move;
 }
 
 function minimax(b, depth, isMax) {
-    let res = checkWinnerSilent(b);
-    if (res === aiPlayer) return 10;
-    if (res === 'X') return -10;
-    if (res === 'tie') return 0;
+    if (checkWinSilent(b, 'O')) return 10;
+    if (checkWinSilent(b, 'X')) return -10;
+    if (b.every(c => c !== '')) return 0;
 
     if (isMax) {
         let best = -Infinity;
         for (let i = 0; i < 9; i++) {
             if (b[i] === '') {
-                b[i] = aiPlayer;
+                b[i] = 'O';
                 best = Math.max(best, minimax(b, depth + 1, false));
                 b[i] = '';
             }
@@ -91,23 +126,8 @@ function minimax(b, depth, isMax) {
     }
 }
 
-function checkGameStatus() {
-    let result = checkWinnerSilent(board);
-    if (result) {
-        gameActive = false;
-        if (result === 'tie') document.getElementById('status').innerText = "It's a Tie!";
-        else document.getElementById('status').innerText = result === 'X' ? "You Win!" : "AI Wins!";
-        return true;
-    }
-    return false;
-}
-
-function checkWinnerSilent(b) {
-    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for (let p of wins) {
-        if (b[p[0]] && b[p[0]] === b[p[1]] && b[p[0]] === b[p[2]]) return b[p[0]];
-    }
-    return b.includes('') ? null : 'tie';
+function checkWinSilent(b, p) {
+    return winPatterns.some(pat => pat.every(i => b[i] === p));
 }
 
 function updateUI() {
@@ -121,9 +141,11 @@ function updateUI() {
 function resetBoard() {
     board = ['', '', '', '', '', '', '', '', ''];
     currentPlayer = 'X';
-    gameActive = true;
-    document.getElementById('status').innerText = "Your Turn (X)";
-    updateUI();
+    document.querySelectorAll('.cell').forEach(c => {
+        c.innerText = '';
+        c.classList.remove('winner');
+    });
+    document.getElementById('status').innerText = "Player X's Turn";
 }
 
 function backToMenu() {
